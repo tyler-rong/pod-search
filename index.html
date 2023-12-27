@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Podcast Search</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Press Start 2P', monospace;
+            background-color: #1a1a1a; /* Softer black for background */
+            color: #d3d3d3; /* Soft white for text */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .search-container {
+            width: 600px;
+            margin-top: 150px;
+        }
+        .search-bar {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            font-family: 'Press Start 2P', monospace;
+            border: 1px solid #0f0;
+            background-color: black; /* Black background */
+            color: #0f0; /* Green text */
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .brand-logo-text {
+            color: #0f0;
+            font-size: 32px;
+            letter-spacing: 8px;
+            display: block;
+        }
+        .results-container {
+            width: 100%;
+            padding-left: 20px;
+        }
+        .total-results {
+            padding-left: 20px;
+            margin-top: 20px;
+            margin-bottom: 30px; /* Additional padding below total results */
+        }
+        table {
+            border-collapse: collapse;
+            margin-left: 0;
+            width: 100%;
+        }
+        th {
+            background-color: #444; /* Slightly lighter for headers */
+            color: #0f0; /* Green text for headers */
+            padding: 10px; /* More padding for headers */
+            cursor: pointer; /* Add cursor pointer to table headers */
+            text-align: left; /* Align text to left */
+        }
+        td {
+            border: 1px solid #555; /* Softer border color for cells */
+            padding: 8px; /* More padding inside cells */
+            color: #d3d3d3; /* Soft white for text */
+        }
+        tr:nth-child(odd) {
+            background-color: #1c1c1c; /* Zebra striping for rows */
+        }
+        tr:hover {
+            background-color: #333; /* Hover effect for rows */
+        }
+        a {
+            color: #4990e2; /* A more noticeable link color */
+            text-decoration: underline; /* Underlined links */
+        }
+    </style>
+</head>
+<body>
+    <div class="search-container">
+        <span class="brand-logo-text">Podcast Search</span>
+        <form id="searchForm">
+            <input type="text" id="searchBar" class="search-bar" placeholder="Enter search term...">
+            <button type="submit" style="display: none;">Search</button>
+        </form>
+    </div>
+    <div class="results-container">
+        <div class="total-results">Total Results: <span id="totalResults">0</span></div>
+        <div id="searchResults"></div>
+    </div>
+    <script>
+        document.getElementById('searchForm').onsubmit = function(event) {
+            event.preventDefault();
+            performSearch();
+        };
+
+        function performSearch() {
+            var searchTerm = document.getElementById('searchBar').value;
+            var searchResultsContainer = document.getElementById('searchResults');
+            var totalResultsElement = document.getElementById('totalResults');
+            if (!searchTerm.trim()) {
+                searchResultsContainer.innerHTML = '';
+                totalResultsElement.textContent = '0';
+                return;
+            }
+            fetch('/search?q=' + encodeURIComponent(searchTerm))
+                .then(response => response.json())
+                .then(data => {
+                    var table = document.createElement('table');
+                    var thead = table.createTHead();
+                    var tbody = table.createTBody();
+                    var headRow = thead.insertRow();
+
+                    // Removed '#' from headers
+                    var headers = ['Podcast Name', 'Podcast Host', 'Title', 'Published Date', 'Link'];
+                    headers.forEach(function(text) {
+                        var th = document.createElement('th');
+                        th.textContent = text;
+                        headRow.appendChild(th);
+                    });
+
+                    // Adjusted to remove the numbering column
+                    data.forEach(function(item) {
+                        var row = tbody.insertRow();
+                        headers.forEach(function(header) {
+                            var cell = row.insertCell();
+                            if (header.toLowerCase() === 'link') {
+                                var link = document.createElement('a');
+                                link.href = item.link;
+                                link.textContent = 'Listen';
+                                link.target = '_blank';
+                                cell.appendChild(link);
+                            } else {
+                                cell.textContent = item[header.toLowerCase().replace(/ /g, '_')];
+                            }
+                        });
+                    });
+                    totalResultsElement.textContent = data.length.toString();
+                    searchResultsContainer.innerHTML = '';
+                    searchResultsContainer.appendChild(table);
+                    makeAllTablesSortable();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    searchResultsContainer.innerHTML = 'An error occurred while fetching data.';
+                });
+        }
+        // Sorting functionality
+        function sortTable(table, col, reverse) {
+            var tb = table.tBodies[0],
+                tr = Array.prototype.slice.call(tb.rows, 0),
+                i;
+            reverse = -((+reverse) || -1);
+            tr = tr.sort(function (a, b) {
+                var aVal = a.cells[col].textContent.trim();
+                var bVal = b.cells[col].textContent.trim();
+                if (col === 4) { // Assuming 'Published Date' is in the 5th column (index 4)
+                    aVal = new Date(aVal);
+                    bVal = new Date(bVal);
+                    return reverse * (aVal - bVal);
+                } else {
+                    return reverse * (aVal.localeCompare(bVal));
+                }
+            });
+            for (i = 0; i < tr.length; ++i) tb.appendChild(tr[i]);
+        }
+        function makeSortable(table) {
+            var th = table.tHead, i;
+            th && (th = th.rows[0]) && (th = th.cells);
+            if (th) i = th.length;
+            else return;
+            while (--i >= 0) (function (i) {
+                var dir = 1;
+                th[i].addEventListener('click', function () { sortTable(table, i, (dir = 1 - dir)) });
+            }(i));
+        }
+        function makeAllTablesSortable() {
+            var t = document.getElementsByTagName('table'), i = t.length;
+            while (--i >= 0) makeSortable(t[i]);
+        }
+    </script>
+</body>
+</html>
+
