@@ -93,16 +93,12 @@
 
     document.getElementById('searchForm').onsubmit = function(event) {
         event.preventDefault();
-        if (csvData.length > 0) {
-            performSearch();
-        } else {
-            console.log("Data is not yet loaded.");
-        }
+        performSearch();
     };
 
     function fetchCSVData() {
         const csvUrl = 'https://raw.githubusercontent.com/tyler-rong/my-website/main/podcast_summary.csv';
-        fetch(csvUrl)
+        return fetch(csvUrl) // Return the promise from fetch
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -115,26 +111,23 @@
                     dynamicTyping: true,
                     skipEmptyLines: true
                 }).data;
+                document.getElementById('searchBar').disabled = false; // Enable search bar after data is loaded
                 console.log("CSV Data Loaded:", csvData); // For debugging: log the loaded CSV data
             })
             .catch(e => {
                 console.error('Error fetching or parsing CSV:', e);
+                document.getElementById('searchBar').disabled = true; // Disable search bar if data load fails
             });
     }
 
     // Call fetchCSVData when the window loads
-    window.addEventListener('load', fetchCSVData);
-
-        function performSearch() {
-            const searchTerm = document.getElementById('searchBar').value.toLowerCase();
-            const filteredData = csvData.filter(row => {
-                return Object.values(row).some(
-                    value => value.toString().toLowerCase().includes(searchTerm)
-                );
-            });
-            displayResults(filteredData);
-        }
-
+    window.addEventListener('load', () => {
+        document.getElementById('searchBar').disabled = true; // Initially disable search bar
+        fetchCSVData().then(() => {
+            // CSV data is now loaded, enable the search
+            document.getElementById('searchBar').disabled = false;
+        });
+    });
 function displayResults(results) {
     const searchResultsContainer = document.getElementById('searchResults');
     const totalResultsElement = document.getElementById('totalResults');
