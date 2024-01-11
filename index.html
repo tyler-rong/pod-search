@@ -85,6 +85,12 @@
             display: block; /* Make the toggle a block to occupy its own line */
             margin: 5px 0;
         }
+                table th:nth-child(3), table td:nth-child(3) {
+            max-width: 120px; /* Set a smaller max-width */
+            overflow: hidden; /* Ensures content doesn't spill out */
+            text-overflow: ellipsis; /* Adds an ellipsis if the content is too long */
+            white-space: nowrap; /* Stops the text from wrapping to a new line */
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 </head>
