@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,8 +8,8 @@
     <style>
         body {
             font-family: 'Press Start 2P', monospace;
-            background-color: #1a1a1a; /* Softer black for background */
-            color: #d3d3d3; /* Soft white for text */
+            background-color: #1a1a1a;
+            color: #d3d3d3;
             margin: 0;
             padding: 0;
             display: flex;
@@ -27,8 +26,8 @@
             font-size: 16px;
             font-family: 'Press Start 2P', monospace;
             border: 1px solid #0f0;
-            background-color: black; /* Black background */
-            color: #0f0; /* Green text */
+            background-color: black;
+            color: #0f0;
             border-radius: 5px;
             margin-top: 20px;
         }
@@ -45,7 +44,7 @@
         .total-results {
             padding-left: 20px;
             margin-top: 20px;
-            margin-bottom: 30px; /* Additional padding below total results */
+            margin-bottom: 30px;
         }
         table {
             border-collapse: collapse;
@@ -53,28 +52,29 @@
             width: 100%;
         }
         th {
-            background-color: #444; /* Slightly lighter for headers */
-            color: #0f0; /* Green text for headers */
-            padding: 10px; /* More padding for headers */
-            cursor: pointer; /* Add cursor pointer to table headers */
-            text-align: left; /* Align text to left */
+            background-color: #444;
+            color: #0f0;
+            padding: 10px;
+            cursor: pointer;
+            text-align: left;
         }
         td {
-            border: 1px solid #555; /* Softer border color for cells */
-            padding: 8px; /* More padding inside cells */
-            color: #d3d3d3; /* Soft white for text */
+            border: 1px solid #555;
+            padding: 8px;
+            color: #d3d3d3;
         }
         tr:nth-child(odd) {
-            background-color: #1c1c1c; /* Zebra striping for rows */
+            background-color: #1c1c1c;
         }
         tr:hover {
-            background-color: #333; /* Hover effect for rows */
+            background-color: #333;
         }
         a {
-            color: #4990e2; /* A more noticeable link color */
-            text-decoration: underline; /* Underlined links */
+            color: #4990e2;
+            text-decoration: underline;
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 </head>
 <body>
     <div class="search-container">
@@ -94,56 +94,71 @@
             performSearch();
         };
 
-        function performSearch() {
-            var searchTerm = document.getElementById('searchBar').value;
-            var searchResultsContainer = document.getElementById('searchResults');
-            var totalResultsElement = document.getElementById('totalResults');
-            if (!searchTerm.trim()) {
-                searchResultsContainer.innerHTML = '';
-                totalResultsElement.textContent = '0';
-                return;
-            }
-            fetch('/search?q=' + encodeURIComponent(searchTerm))
-                .then(response => response.json())
-                .then(data => {
-                    var table = document.createElement('table');
-                    var thead = table.createTHead();
-                    var tbody = table.createTBody();
-                    var headRow = thead.insertRow();
-
-                    // Removed '#' from headers
-                    var headers = ['Podcast Name', 'Podcast Host', 'Title', 'Published Date', 'Link'];
-                    headers.forEach(function(text) {
-                        var th = document.createElement('th');
-                        th.textContent = text;
-                        headRow.appendChild(th);
-                    });
-
-                    // Adjusted to remove the numbering column
-                    data.forEach(function(item) {
-                        var row = tbody.insertRow();
-                        headers.forEach(function(header) {
-                            var cell = row.insertCell();
-                            if (header.toLowerCase() === 'link') {
-                                var link = document.createElement('a');
-                                link.href = item.link;
-                                link.textContent = 'Listen';
-                                link.target = '_blank';
-                                cell.appendChild(link);
-                            } else {
-                                cell.textContent = item[header.toLowerCase().replace(/ /g, '_')];
-                            }
-                        });
-                    });
-                    totalResultsElement.textContent = data.length.toString();
-                    searchResultsContainer.innerHTML = '';
-                    searchResultsContainer.appendChild(table);
-                    makeAllTablesSortable();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    searchResultsContainer.innerHTML = 'An error occurred while fetching data.';
+        function fetchCSVData() {
+            const csvUrl = 'https://raw.githubusercontent.com/yourusername/yourrepo/main/podcast_summary.csv';
+            fetch(csvUrl)
+                .then(response => response.text())
+                .then(csvText => {
+                    csvData = Papa.parse(csvText, {
+                        header: true,
+                        dynamicTyping: true,
+                        skipEmptyLines: true
+                    }).data;
                 });
+        }
+
+        fetchCSVData();
+
+        function performSearch() {
+            const searchTerm = document.getElementById('searchBar').value.toLowerCase();
+            const filteredData = csvData.filter(row => {
+                return Object.values(row).some(
+                    value => value.toString().toLowerCase().includes(searchTerm)
+                );
+            });
+            displayResults(filteredData);
+        }
+
+        function displayResults(results) {
+            const searchResultsContainer = document.getElementById('searchResults');
+            const totalResultsElement = document.getElementById('totalResults');
+            totalResultsElement.textContent = results.length;
+            
+            // Clear previous results
+            searchResultsContainer.innerHTML = '';
+            if (results.length > 0) {
+                const table = document.createElement('table');
+                const thead = table.createTHead();
+                const tbody = table.createTBody();
+                const headRow = thead.insertRow();
+                
+                // Create table headers
+                ['Podcast Name', 'Podcast Host', 'Title', 'Published Date', 'Link'].forEach(text => {
+                    const th = document.createElement('th');
+                    th.textContent = text;
+                    headRow.appendChild(th);
+                });
+                
+                // Create table rows
+                results.forEach(item => {
+                    const row = tbody.insertRow();
+                    Object.keys(item).forEach(key => {
+                        const cell = row.insertCell();
+                        if (key === 'link') {
+                            const link = document.createElement('a');
+                            link.href = item[key];
+                            link.textContent = 'Listen';
+                            link.target = '_blank';
+                            cell.appendChild(link);
+                        } else {
+                            cell.textContent = item[key];
+                        }
+                    });
+                });
+                searchResultsContainer.appendChild(table);
+            } else {
+                searchResultsContainer.textContent = 'No results found.';
+            }
         }
         // Sorting functionality
         function sortTable(table, col, reverse) {
