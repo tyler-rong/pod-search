@@ -119,47 +119,48 @@
             displayResults(filteredData);
         }
 
-        function displayResults(results) {
-            const searchResultsContainer = document.getElementById('searchResults');
-            const totalResultsElement = document.getElementById('totalResults');
-            totalResultsElement.textContent = results.length;
-            
-            // Clear previous results
-            searchResultsContainer.innerHTML = '';
-            if (results.length > 0) {
-                const table = document.createElement('table');
-                const thead = table.createTHead();
-                const tbody = table.createTBody();
-                const headRow = thead.insertRow();
-                
-                // Create table headers
-                ['Podcast Name', 'Podcast Host', 'Title', 'Published Date', 'Link'].forEach(text => {
-                    const th = document.createElement('th');
-                    th.textContent = text;
-                    headRow.appendChild(th);
-                });
-                
-                // Create table rows
-                results.forEach(item => {
-                    const row = tbody.insertRow();
-                    Object.keys(item).forEach(key => {
-                        const cell = row.insertCell();
-                        if (key === 'link') {
-                            const link = document.createElement('a');
-                            link.href = item[key];
-                            link.textContent = 'Listen';
-                            link.target = '_blank';
-                            cell.appendChild(link);
-                        } else {
-                            cell.textContent = item[key];
-                        }
-                    });
-                });
-                searchResultsContainer.appendChild(table);
-            } else {
-                searchResultsContainer.textContent = 'No results found.';
-            }
-        }
+function displayResults(results) {
+    const searchResultsContainer = document.getElementById('searchResults');
+    const totalResultsElement = document.getElementById('totalResults');
+    totalResultsElement.textContent = results.length;
+    
+    // Clear previous results
+    searchResultsContainer.innerHTML = '';
+    if (results.length > 0) {
+        const table = document.createElement('table');
+        const thead = table.createTHead();
+        const tbody = table.createTBody();
+        const headRow = thead.insertRow();
+        
+        // Create table headers
+        ['Podcast Name', 'Podcast Host', 'Title', 'Summary', 'Tags', 'Published Date', 'Link'].forEach(text => {
+            const th = document.createElement('th');
+            th.textContent = text;
+            headRow.appendChild(th);
+        });
+        
+        // Create table rows
+        results.forEach(item => {
+            const row = tbody.insertRow();
+            ['podcast_name', 'podcast_host', 'title', 'summary', 'tags', 'published_date', 'link'].forEach(key => {
+                const cell = row.insertCell();
+                if (key === 'link') {
+                    const link = document.createElement('a');
+                    link.href = item[key];
+                    link.textContent = 'Listen';
+                    link.target = '_blank';
+                    cell.appendChild(link);
+                } else {
+                    cell.textContent = item[key];
+                }
+            });
+        });
+        searchResultsContainer.appendChild(table);
+        makeAllTablesSortable();
+    } else {
+        searchResultsContainer.textContent = 'No results found.';
+    }
+}
         // Sorting functionality
         function sortTable(table, col, reverse) {
             var tb = table.tBodies[0],
