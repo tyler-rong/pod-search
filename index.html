@@ -88,26 +88,42 @@
         <div class="total-results">Total Results: <span id="totalResults">0</span></div>
         <div id="searchResults"></div>
     </div>
-    <script>
-        document.getElementById('searchForm').onsubmit = function(event) {
-            event.preventDefault();
+<script>
+    let csvData = []; // Declare csvData in the global scope
+
+    document.getElementById('searchForm').onsubmit = function(event) {
+        event.preventDefault();
+        if (csvData.length > 0) {
             performSearch();
-        };
-
-        function fetchCSVData() {
-            const csvUrl = 'https://raw.githubusercontent.com/tyler-rong/my-website/main/podcast_summary.csv';
-            fetch(csvUrl)
-                .then(response => response.text())
-                .then(csvText => {
-                    csvData = Papa.parse(csvText, {
-                        header: true,
-                        dynamicTyping: true,
-                        skipEmptyLines: true
-                    }).data;
-                });
+        } else {
+            console.log("Data is not yet loaded.");
         }
+    };
 
-        fetchCSVData();
+    function fetchCSVData() {
+        const csvUrl = 'https://raw.githubusercontent.com/tyler-rong/my-website/main/podcast_summary.csv';
+        fetch(csvUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(csvText => {
+                csvData = Papa.parse(csvText, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true
+                }).data;
+                console.log("CSV Data Loaded:", csvData); // For debugging: log the loaded CSV data
+            })
+            .catch(e => {
+                console.error('Error fetching or parsing CSV:', e);
+            });
+    }
+
+    // Call fetchCSVData when the window loads
+    window.addEventListener('load', fetchCSVData);
 
         function performSearch() {
             const searchTerm = document.getElementById('searchBar').value.toLowerCase();
