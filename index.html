@@ -258,6 +258,17 @@
             var t = document.getElementsByTagName('table'), i = t.length;
             while (--i >= 0) makeSortable(t[i]);
         }
+          // Toggle search mode based on radio buttons
+    const searchAllRadio = document.getElementById('searchAll');
+    const searchGuestRadio = document.getElementById('searchGuest');
+
+    searchAllRadio.addEventListener('change', function () {
+        performSearch(); // Run the search again when "Search All" is selected
+    });
+
+    searchGuestRadio.addEventListener('change', function () {
+        performSearch(); // Run the search again when "Search by Guest" is selected
+    });
     </script>
 </body>
 </html>
