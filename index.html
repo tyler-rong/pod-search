@@ -16,29 +16,21 @@
             flex-direction: column;
             align-items: center;
         }
-                .search-container {
+        .search-container {
             display: flex; /* Use flexbox for layout */
-            flex-direction: row; /* Align items horizontally */
-            align-items: center; /* Center items vertically */
-            justify-content: flex-start; /* Align items to the start of the container */
+            flex-direction: column; /* Stack items vertically */
+            align-items: center; /* Center items horizontally */
             width: auto;
-            padding: 0 20px;
+            padding: 0;
             box-sizing: border-box;
             margin-top: 150px;
         }
-        
-        label {
-            display: inline-block;
-            margin-left: 5px;
-            vertical-align: middle;
-        }
-        
-        /* Adjustments for responsive layout */
-        @media (max-width: 700px) {
-            .search-container {
-                width: 95%;
-                padding: 0 10px;
-            }
+        .search-bar-container {
+            display: flex; /* Use flexbox for layout */
+            flex-direction: row; /* Align items horizontally */
+            width: 100%;
+            align-items: center; /* Center items vertically */
+            justify-content: center; /* Center items horizontally */
         }
         .search-bar {
             width: 100%;
@@ -50,6 +42,17 @@
             color: #0f0;
             border-radius: 5px;
             margin-top: 20px;
+        }
+        label {
+            margin-left: 10px; /* Space between checkbox and label */
+        }
+        /* Adjustments for responsive layout */
+        @media (max-width: 700px) {
+            .search-container {
+                width: 95%; /* Adjust for smaller screens */
+                padding: 0;
+                margin-top: 20px;
+            }
         }
         .brand-logo-text {
             color: #0f0;
@@ -112,14 +115,16 @@
 <body>
     <div class="search-container">
         <span class="brand-logo-text">Podcast Search</span>
-        <form id="searchForm">
-            <input type="text" id="searchBar" class="search-bar" placeholder="Enter search term...">
-            <div>
-                <input type="checkbox" id="toggleSearch" name="toggleSearch">
-                <label for="toggleSearch">Guest</label>
-            </div>
-            <button type="submit" style="display: none;">Search</button>
-        </form>
+        <div class="search-bar-container">
+            <form id="searchForm">
+                <input type="text" id="searchBar" class="search-bar" placeholder="Enter search term...">
+                <label for="toggleSearch">
+                    <input type="checkbox" id="toggleSearch" name="toggleSearch">
+                    Guest
+                </label>
+                <button type="submit" style="display: none;">Search</button>
+            </form>
+        </div>
     </div>
     <div class="results-container">
         <div class="total-results">Total Results: <span id="totalResults">0</span></div>
