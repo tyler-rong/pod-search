@@ -168,18 +168,21 @@
     // Call fetchCSVData when the window loads
     window.addEventListener('load', fetchCSVData);
 
-   function performSearch() {
+  function performSearch() {
     const searchTerm = document.getElementById('searchBar').value.toLowerCase();
     const isTitleOnly = document.getElementById('toggleSearch').checked;
 
     const filteredData = csvData.filter(row => {
+        // Make sure 'title' is in the correct case as it appears in your CSV file
+        const titleText = row['title'] ? row['title'].toString().toLowerCase() : '';
+
+        // When the 'Guest' checkbox is checked, search only within the 'title' column
         if (isTitleOnly) {
-            // Search only in the 'title' column, make sure it matches the CSV exactly
-            return row['title'] && row['title'].toString().toLowerCase().includes(searchTerm);
+            return titleText.includes(searchTerm);
         } else {
-            // Search in every column
+            // When not checked, search all columns
             return Object.values(row).some(
-                value => value && value.toString().toLowerCase().includes(searchTerm)
+                value => value.toString().toLowerCase().includes(searchTerm)
             );
         }
     });
