@@ -168,13 +168,13 @@
     // Call fetchCSVData when the window loads
     window.addEventListener('load', fetchCSVData);
 
-    function performSearch() {
+   function performSearch() {
     const searchTerm = document.getElementById('searchBar').value.toLowerCase();
     const isTitleOnly = document.getElementById('toggleSearch').checked;
 
     const filteredData = csvData.filter(row => {
         if (isTitleOnly) {
-            // Search only in the 'title' column
+            // Search only in the 'title' column, make sure it matches the CSV exactly
             return row['title'] && row['title'].toString().toLowerCase().includes(searchTerm);
         } else {
             // Search in every column
