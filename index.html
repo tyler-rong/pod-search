@@ -94,6 +94,10 @@
         <span class="brand-logo-text">Podcast Search</span>
         <form id="searchForm">
             <input type="text" id="searchBar" class="search-bar" placeholder="Enter search term...">
+            <div>
+                <input type="checkbox" id="toggleSearch" name="toggleSearch">
+                <label for="toggleSearch">Guest'</label>
+            </div>
             <button type="submit" style="display: none;">Search</button>
         </form>
     </div>
@@ -137,16 +141,24 @@
     window.addEventListener('load', fetchCSVData);
 
     function performSearch() {
-        const searchTerm = document.getElementById('searchBar').value.toLowerCase();
-        console.log("Searching for:", searchTerm); // Debugging: log the search term
-        const filteredData = csvData.filter(row => {
+    const searchTerm = document.getElementById('searchBar').value.toLowerCase();
+    const isTitleOnly = document.getElementById('toggleSearch').checked; // Check the state of the toggle
+
+    const filteredData = csvData.filter(row => {
+        if (isTitleOnly) {
+            // Search only in the 'Title' column
+            return row['Title'] && row['Title'].toString().toLowerCase().includes(searchTerm);
+        } else {
+            // Search in every column
             return Object.values(row).some(
                 value => value && value.toString().toLowerCase().includes(searchTerm)
             );
-        });
-        console.log("Filtered Data:", filteredData); // Debugging: log the filtered results
-        displayResults(filteredData);
-    }
+        }
+    });
+
+    console.log("Filtered Data:", filteredData);
+    displayResults(filteredData);
+}
     
 function displayResults(results) {
         const searchResultsContainer = document.getElementById('searchResults');
