@@ -16,9 +16,29 @@
             flex-direction: column;
             align-items: center;
         }
-        .search-container {
-            width: 600px;
+                .search-container {
+            display: flex; /* Use flexbox for layout */
+            flex-direction: row; /* Align items horizontally */
+            align-items: center; /* Center items vertically */
+            justify-content: flex-start; /* Align items to the start of the container */
+            width: auto;
+            padding: 0 20px;
+            box-sizing: border-box;
             margin-top: 150px;
+        }
+        
+        label {
+            display: inline-block;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+        
+        /* Adjustments for responsive layout */
+        @media (max-width: 700px) {
+            .search-container {
+                width: 95%;
+                padding: 0 10px;
+            }
         }
         .search-bar {
             width: 100%;
@@ -96,7 +116,7 @@
             <input type="text" id="searchBar" class="search-bar" placeholder="Enter search term...">
             <div>
                 <input type="checkbox" id="toggleSearch" name="toggleSearch">
-                <label for="toggleSearch">Guest'</label>
+                <label for="toggleSearch">Guest</label>
             </div>
             <button type="submit" style="display: none;">Search</button>
         </form>
