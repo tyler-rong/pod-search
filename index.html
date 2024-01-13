@@ -16,57 +16,64 @@
             flex-direction: column;
             align-items: center;
         }
+    .search-container {
+        display: flex; /* Use flexbox for layout */
+        flex-direction: column; /* Stack items vertically */
+        align-items: center; /* Center items horizontally */
+        width: auto;
+        padding: 0;
+        box-sizing: border-box;
+        margin-top: 150px;
+    }
+
+    .search-bar-container {
+        display: flex; /* Use flexbox for layout */
+        flex-direction: row; /* Align items horizontally */
+        justify-content: center; /* Center items horizontally */
+        align-items: center; /* Center items vertically */
+        margin-bottom: 20px;
+        width: 100%;
+        max-width: 600px; /* Set a max-width for larger screens */
+    }
+
+    .search-bar {
+        padding: 10px;
+        font-size: 16px;
+        font-family: 'Press Start 2P', monospace;
+        border: 1px solid #0f0;
+        background-color: black;
+        color: #0f0;
+        border-radius: 5px;
+        width: 100%; /* Ensure search bar fills container */
+    }
+    
+    label {
+        margin-left: 10px; /* Space between checkbox and label */
+        display: flex;
+        align-items: center; /* Align the label text with the checkbox */
+    }
+    
+    /* Adjustments for responsive layout */
+    @media (max-width: 700px) {
         .search-container {
-            display: flex; /* Use flexbox for layout */
-            flex-direction: column; /* Stack items vertically */
-            align-items: center; /* Center items horizontally */
-            width: auto;
+            width: 95%; /* Adjust for smaller screens */
             padding: 0;
-            box-sizing: border-box;
-            margin-top: 150px;
+            margin-top: 20px;
         }
-        
-        .search-bar-container {
-            display: flex; /* Use flexbox for layout */
-            flex-direction: row; /* Align items horizontally */
-            justify-content: center; /* Center items horizontally */
-            align-items: center; /* Center items vertically */
-            margin-bottom: 20px;
-        }
-        
-        .search-bar {
-            padding: 10px;
-            font-size: 16px;
-            font-family: 'Press Start 2P', monospace;
-            border: 1px solid #0f0;
-            background-color: black;
-            color: #0f0;
-            border-radius: 5px;
-        }
-        
-        label {
-            margin-left: 10px; /* Space between checkbox and label */
-            display: flex;
-            align-items: center; /* Align the label text with the checkbox */
-        }
-        /* Adjustments for responsive layout */
-        @media (max-width: 700px) {
-            .search-container {
-                width: 95%; /* Adjust for smaller screens */
-                padding: 0;
-                margin-top: 20px;
-            }
-        }
-        .brand-logo-text {
-            color: #0f0;
-            font-size: 32px;
-            letter-spacing: 8px;
-            display: block;
-        }
-        .results-container {
-            width: 95%;
-            padding-left: 20px;
-        }
+    }
+    
+    .brand-logo-text {
+        color: #0f0;
+        font-size: 32px;
+        letter-spacing: 8px;
+        display: block;
+        margin-bottom: 20px; /* Added margin for spacing */
+    }
+    
+    .results-container {
+        width: 95%;
+        padding-left: 20px;
+    }
         .total-results {
             padding-left: 20px;
             margin-top: 20px;
@@ -168,26 +175,36 @@
     // Call fetchCSVData when the window loads
     window.addEventListener('load', fetchCSVData);
 
-  function performSearch() {
+function performSearch() {
+    // Retrieve the search term entered by the user and convert it to lowercase.
     const searchTerm = document.getElementById('searchBar').value.toLowerCase();
+
+    // Check whether the 'Guest' checkbox is selected.
     const isTitleOnly = document.getElementById('toggleSearch').checked;
 
+    // Filter the CSV data based on the search term and the state of the checkbox.
     const filteredData = csvData.filter(row => {
-        // Make sure 'title' is in the correct case as it appears in your CSV file
+        // Get the text from the 'title' column of the current row, in lowercase.
+        // If the 'title' column is not present, use an empty string.
         const titleText = row['title'] ? row['title'].toString().toLowerCase() : '';
 
-        // When the 'Guest' checkbox is checked, search only within the 'title' column
+        // If the 'Guest' checkbox is checked, only include rows where the
+        // 'title' column contains the search term.
         if (isTitleOnly) {
             return titleText.includes(searchTerm);
         } else {
-            // When not checked, search all columns
+            // If the checkbox is not checked, include rows where any column
+            // contains the search term.
             return Object.values(row).some(
                 value => value.toString().toLowerCase().includes(searchTerm)
             );
         }
     });
 
+    // Log the filtered data to the console for debugging purposes.
     console.log("Filtered Data:", filteredData);
+
+    // Call the function to display the filtered search results.
     displayResults(filteredData);
 }
     
