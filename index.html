@@ -25,15 +25,16 @@
             box-sizing: border-box;
             margin-top: 150px;
         }
+        
         .search-bar-container {
             display: flex; /* Use flexbox for layout */
             flex-direction: row; /* Align items horizontally */
-            width: 100%;
-            align-items: center; /* Center items vertically */
             justify-content: center; /* Center items horizontally */
+            align-items: center; /* Center items vertically */
+            margin-bottom: 20px;
         }
+        
         .search-bar {
-            width: 100%;
             padding: 10px;
             font-size: 16px;
             font-family: 'Press Start 2P', monospace;
@@ -41,10 +42,12 @@
             background-color: black;
             color: #0f0;
             border-radius: 5px;
-            margin-top: 20px;
         }
+        
         label {
             margin-left: 10px; /* Space between checkbox and label */
+            display: flex;
+            align-items: center; /* Align the label text with the checkbox */
         }
         /* Adjustments for responsive layout */
         @media (max-width: 700px) {
@@ -167,12 +170,12 @@
 
     function performSearch() {
     const searchTerm = document.getElementById('searchBar').value.toLowerCase();
-    const isTitleOnly = document.getElementById('toggleSearch').checked; // Check the state of the toggle
+    const isTitleOnly = document.getElementById('toggleSearch').checked;
 
     const filteredData = csvData.filter(row => {
         if (isTitleOnly) {
-            // Search only in the 'Title' column
-            return row['Title'] && row['Title'].toString().toLowerCase().includes(searchTerm);
+            // Search only in the 'title' column
+            return row['title'] && row['title'].toString().toLowerCase().includes(searchTerm);
         } else {
             // Search in every column
             return Object.values(row).some(
