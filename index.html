@@ -175,36 +175,31 @@
     // Call fetchCSVData when the window loads
     window.addEventListener('load', fetchCSVData);
 
+// Function to handle the search operation
 function performSearch() {
-    // Retrieve the search term entered by the user and convert it to lowercase.
+    // Retrieve the search term from the input field and convert it to lowercase for case-insensitive search
     const searchTerm = document.getElementById('searchBar').value.toLowerCase();
 
-    // Check whether the 'Guest' checkbox is selected.
+    // Check the state of the 'Guest' checkbox
     const isTitleOnly = document.getElementById('toggleSearch').checked;
 
-    // Filter the CSV data based on the search term and the state of the checkbox.
+    // Filter the CSV data based on the search term and checkbox state
     const filteredData = csvData.filter(row => {
-        // Get the text from the 'title' column of the current row, in lowercase.
-        // If the 'title' column is not present, use an empty string.
+        // Retrieve the title text from the row and convert it to lowercase
         const titleText = row['title'] ? row['title'].toString().toLowerCase() : '';
 
-        // If the 'Guest' checkbox is checked, only include rows where the
-        // 'title' column contains the search term.
+        // If the 'Guest' checkbox is checked, search only in the 'title' column
         if (isTitleOnly) {
             return titleText.includes(searchTerm);
         } else {
-            // If the checkbox is not checked, include rows where any column
-            // contains the search term.
+            // If the checkbox is not checked, search in all columns
             return Object.values(row).some(
                 value => value.toString().toLowerCase().includes(searchTerm)
             );
         }
     });
 
-    // Log the filtered data to the console for debugging purposes.
-    console.log("Filtered Data:", filteredData);
-
-    // Call the function to display the filtered search results.
+    // Display the filtered search results
     displayResults(filteredData);
 }
     
